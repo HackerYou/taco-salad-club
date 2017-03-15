@@ -19,11 +19,12 @@ class App extends React.Component {
 		super();
 		this.state = {
 			loggedin: false,
-			items: [{
-				name: "Ryan",
-				item: "Sour Cream"
-			}]
+			items: [],
+			name: "",
+			item: ""
 		}
+		this.addItem = this.addItem.bind(this);
+		this.handleChange = this.handleChange.bind(this);
 	}
 	componentDidMount() {
 		firebase.auth().onAuthStateChanged((data) => {
@@ -31,6 +32,37 @@ class App extends React.Component {
 				loggedin: true
 			});
 		});
+
+		firebase.database().ref().on('value', (data) => {
+			const values = data.val();
+			const items = [];
+			for(let key in values) {
+				values[key].key = key;
+				items.push(values[key])
+			}
+			this.setState({
+				items
+			});
+		});
+	}
+	handleChange(e) {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	}
+	addItem(e) {
+		e.preventDefault();
+		if(firebase.auth().currentUser !== null) {
+			firebase.database().ref().push({
+				name: this.state.name,
+				item: this.state.item
+			});
+
+			this.setState({
+				name: "",
+				item: ""
+			});
+		}
 	}
 	render() {
 		let loggedin = "Make sure you login to see taco salad club items!";
@@ -42,8 +74,15 @@ class App extends React.Component {
 				<Header />
 				<section>
 				{loggedin}
+				<form onSubmit={this.addItem}>
+					<label htmlFor="item">Item: </label>
+					<input type="text" name="item" onChange={this.handleChange}/>
+					<label htmlFor="name">Name: </label>
+					<input type="text" name="name" onChange={this.handleChange}/>
+					<button>Add Item</button>
+				</form>
 				{this.state.items.map((item) => {
-					return <ClubItem data={item} key={item}/>
+					return <ClubItem data={item} key={item.key}/>
 				})}
 				</section>
 				<Footer />

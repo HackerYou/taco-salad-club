@@ -69,8 +69,10 @@ export default class Header extends React.Component {
 			<header>
 				<h1>Taco Salad Club</h1>
 				<nav>
-					<li><a href="" className="signup" onClick={this.formToShow}>Sign Up</a></li>
-					<li><a href="" className="login" onClick={this.formToShow}>Log In</a></li>
+					<ul>
+						<li><a href="" className="signup" onClick={this.formToShow}>Sign Up</a></li>
+						<li><a href="" className="login" onClick={this.formToShow}>Log In</a></li>
+					</ul>
 				</nav>
 				{loginForm}
 			</header>
